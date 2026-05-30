@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
+import { Briefcase, Mail, Lock } from 'lucide-react';
+import API_URL from '../config';
 
 export default function Login() {
   const { login } = useAuth();
@@ -14,7 +16,7 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      const { data } = await axios.post('http://localhost:5000/api/auth/login', form);
+      const { data } = await axios.post(`${API_URL}/api/auth/login`, form);
       login(data);
       toast.success('Welcome back!');
       navigate(data.role === 'employer' ? '/employer/dashboard' : '/jobs');
@@ -25,32 +27,51 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 w-full max-w-md">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Welcome back</h1>
-        <p className="text-gray-500 text-sm mb-6">Sign in to your account</p>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+    <div className="mesh-bg min-h-screen flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="w-14 h-14 gradient-btn rounded-2xl flex items-center justify-center mx-auto mb-4 glow">
+            <Briefcase size={24} className="text-white" />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          </div>
-          <button type="submit" disabled={loading}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg transition text-sm disabled:opacity-60">
-            {loading ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
+          <h1 className="text-3xl font-bold gradient-text">Welcome Back</h1>
+          <p className="text-gray-400 mt-2">Sign in to your account</p>
+        </div>
 
-        <p className="text-center text-sm text-gray-500 mt-4">
-          Don't have an account?{' '}
-          <Link to="/register" className="text-indigo-600 font-medium hover:underline">Sign up</Link>
-        </p>
+        <div className="glass-card rounded-3xl p-8">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="text-sm font-medium text-gray-300 block mb-2">Email</label>
+              <div className="relative">
+                <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                <input type="email" value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })} required
+                  placeholder="john@example.com"
+                  className="input-dark w-full rounded-xl pl-10 pr-4 py-3 text-sm" />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-gray-300 block mb-2">Password</label>
+              <div className="relative">
+                <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                <input type="password" value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })} required
+                  placeholder="Your password"
+                  className="input-dark w-full rounded-xl pl-10 pr-4 py-3 text-sm" />
+              </div>
+            </div>
+
+            <button type="submit" disabled={loading}
+              className="gradient-btn w-full text-white font-semibold py-3 rounded-xl disabled:opacity-60">
+              {loading ? 'Signing in...' : 'Sign In'}
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-gray-500 mt-6">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-purple-400 font-medium hover:text-purple-300">Sign up</Link>
+          </p>
+        </div>
       </div>
     </div>
   );
