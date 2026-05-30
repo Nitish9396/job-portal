@@ -5,7 +5,14 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        dark: '#0a0a1a',
+      },
+      backgroundImage: {
+        'mesh': 'radial-gradient(at 40% 20%, rgba(124, 58, 237, 0.3) 0px, transparent 50%)',
+      },
+    },
   },
   plugins: [],
 }

@@ -1,4 +1,69 @@
-return (
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { MapPin, Clock, IndianRupee, Search, Bookmark } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
+import API_URL from '../config';
+
+const typeColors = {
+  'Full-time': 'bg-purple-500/20 text-purple-300 border border-purple-500/30',
+  'Part-time': 'bg-blue-500/20 text-blue-300 border border-blue-500/30',
+  'Contract': 'bg-amber-500/20 text-amber-300 border border-amber-500/30',
+  'Internship': 'bg-pink-500/20 text-pink-300 border border-pink-500/30',
+};
+
+export default function Jobs() {
+  const { user } = useAuth();
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [type, setType] = useState('');
+  const [location, setLocation] = useState('');
+  const [minSalary, setMinSalary] = useState('');
+  const [savedIds, setSavedIds] = useState([]);
+  const [page, setPage] = useState(1);
+  const jobsPerPage = 5;
+
+  const fetchJobs = async () => {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(`${API_URL}/api/jobs`, {
+        params: { search, type, location },
+      });
+      let filtered = data;
+      if (minSalary) filtered = filtered.filter(j => j.salary?.min >= Number(minSalary));
+      setJobs(filtered);
+      setPage(1);
+    } catch (err) {
+      console.error(err);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchJobs();
+    if (user?.role === 'seeker') {
+      axios.get(`${API_URL}/api/auth/saved-jobs`)
+        .then(({ data }) => setSavedIds(data.map(j => j._id)));
+    }
+  }, []);
+
+  const toggleSave = async (jobId) => {
+    if (!user) { toast.error('Please login to save jobs'); return; }
+    try {
+      const { data } = await axios.post(`${API_URL}/api/auth/save-job/${jobId}`);
+      setSavedIds(prev => data.saved ? [...prev, jobId] : prev.filter(id => id !== jobId));
+      toast.success(data.message);
+    } catch {
+      toast.error('Failed to save job');
+    }
+  };
+
+  const paginatedJobs = jobs.slice((page - 1) * jobsPerPage, page * jobsPerPage);
+  const totalPages = Math.ceil(jobs.length / jobsPerPage);
+
+  return (
     <div className="mesh-bg min-h-screen">
       <div className="max-w-5xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold gradient-text mb-6">Browse Jobs</h1>
@@ -58,7 +123,7 @@ return (
                       </div>
                     </Link>
                     <div className="flex flex-col items-end gap-2">
-                      <span className="text-xs font-medium px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                      <span className={`text-xs font-medium px-3 py-1 rounded-full ${typeColors[job.type] || 'bg-gray-500/20 text-gray-300'}`}>
                         {job.type}
                       </span>
                       {user?.role === 'seeker' && (
@@ -97,3 +162,4 @@ return (
       </div>
     </div>
   );
+}
