@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { ArrowLeft, FileText, Mail } from 'lucide-react';
+import API_URL from '../config';
 
 const statusStyles = {
   pending: 'bg-yellow-100 text-yellow-700',
@@ -21,8 +22,8 @@ export default function Applicants() {
     const fetchData = async () => {
       try {
         const [appRes, jobRes] = await Promise.all([
-          axios.get(`http://localhost:5000/api/applications/job/${jobId}`),
-          axios.get(`http://localhost:5000/api/jobs/${jobId}`),
+          axios.get(`${API_URL}/api/applications/job/${jobId}`),
+          axios.get(`${API_URL}/api/jobs/${jobId}`),
         ]);
         setApplications(appRes.data);
         setJobTitle(jobRes.data.title);
@@ -37,7 +38,7 @@ export default function Applicants() {
   const updateStatus = async (appId, status) => {
     try {
       const { data } = await axios.put(
-        `http://localhost:5000/api/applications/${appId}/status`,
+        `${API_URL}/api/applications/${appId}/status`,
         { status }
       );
       setApplications(applications.map(a => a._id === appId ? { ...a, status: data.status } : a));
@@ -54,11 +55,8 @@ export default function Applicants() {
       <Link to="/employer/dashboard" className="flex items-center gap-2 text-sm text-indigo-600 mb-6 hover:underline">
         <ArrowLeft size={16} /> Back to Dashboard
       </Link>
-
       <h1 className="text-2xl font-bold text-gray-900 mb-1">Applicants</h1>
       <p className="text-gray-500 text-sm mb-6">{jobTitle} — {applications.length} applicant{applications.length !== 1 ? 's' : ''}</p>
-
-      {/* Stats */}
       <div className="grid grid-cols-4 gap-3 mb-6">
         {['pending', 'reviewing', 'accepted', 'rejected'].map((s) => (
           <div key={s} className="bg-white border border-gray-200 rounded-xl p-3 text-center">
@@ -69,7 +67,6 @@ export default function Applicants() {
           </div>
         ))}
       </div>
-
       {applications.length === 0 ? (
         <div className="text-center py-20 text-gray-400">No applicants yet</div>
       ) : (
@@ -92,21 +89,18 @@ export default function Applicants() {
                   {app.status}
                 </span>
               </div>
-
               {app.coverLetter && (
                 <div className="bg-gray-50 rounded-xl p-3 mb-3">
                   <p className="text-xs font-medium text-gray-500 mb-1">Cover Letter</p>
                   <p className="text-sm text-gray-700">{app.coverLetter}</p>
                 </div>
               )}
-
               {app.applicant?.resume && (
-                <a href={`http://localhost:5000/${app.applicant.resume}`} target="_blank" rel="noreferrer"
+                <a href={`${API_URL}/${app.applicant.resume}`} target="_blank" rel="noreferrer"
                   className="flex items-center gap-1 text-sm text-indigo-600 hover:underline mb-3">
                   <FileText size={14} /> View Resume
                 </a>
               )}
-
               <div className="flex gap-2 flex-wrap">
                 {['pending', 'reviewing', 'accepted', 'rejected'].map((s) => (
                   <button key={s} onClick={() => updateStatus(app._id, s)}
@@ -120,7 +114,6 @@ export default function Applicants() {
                   </button>
                 ))}
               </div>
-
               <p className="text-xs text-gray-400 mt-2">
                 Applied {new Date(app.createdAt).toLocaleDateString()}
               </p>

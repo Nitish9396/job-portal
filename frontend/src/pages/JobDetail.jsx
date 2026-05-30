@@ -3,7 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
-import { MapPin, IndianRupee, Briefcase, Calendar } from 'lucide-react';
+import { MapPin, IndianRupee, Calendar } from 'lucide-react';
+import API_URL from '../config';
 
 export default function JobDetail() {
   const { id } = useParams();
@@ -15,14 +16,14 @@ export default function JobDetail() {
   const [applied, setApplied] = useState(false);
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/jobs/${id}`).then(({ data }) => setJob(data));
+    axios.get(`${API_URL}/api/jobs/${id}`).then(({ data }) => setJob(data));
   }, [id]);
 
   const handleApply = async () => {
     if (!user) { navigate('/login'); return; }
     setApplying(true);
     try {
-      await axios.post(`http://localhost:5000/api/applications/${id}`, { coverLetter });
+      await axios.post(`${API_URL}/api/applications/${id}`, { coverLetter });
       setApplied(true);
       toast.success('Application submitted!');
     } catch (err) {
@@ -43,19 +44,16 @@ export default function JobDetail() {
           </div>
           <span className="bg-indigo-50 text-indigo-700 text-sm font-medium px-3 py-1 rounded-full">{job.type}</span>
         </div>
-
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
           <div className="flex items-center gap-2 text-sm text-gray-600"><MapPin size={16} className="text-indigo-500" />{job.location}</div>
           <div className="flex items-center gap-2 text-sm text-gray-600"><IndianRupee size={16} className="text-indigo-500" />{job.salary.min}–{job.salary.max}L/yr</div>
           <div className="flex items-center gap-2 text-sm text-gray-600"><Calendar size={16} className="text-indigo-500" />{new Date(job.createdAt).toLocaleDateString()}</div>
         </div>
-
         <div className="flex flex-wrap gap-2 mb-6">
           {job.skills.map((s) => (
             <span key={s} className="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full">{s}</span>
           ))}
         </div>
-
         <h2 className="text-base font-semibold text-gray-900 mb-2">Job Description</h2>
         <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap">{job.description}</p>
       </div>

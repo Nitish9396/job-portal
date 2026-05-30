@@ -3,15 +3,20 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { Plus, Trash2, Users } from 'lucide-react';
+import API_URL from '../config';
 
-const statusColors = { active: 'bg-green-100 text-green-700', paused: 'bg-yellow-100 text-yellow-700', closed: 'bg-red-100 text-red-700' };
+const statusColors = {
+  active: 'bg-green-100 text-green-700',
+  paused: 'bg-yellow-100 text-yellow-700',
+  closed: 'bg-red-100 text-red-700'
+};
 
 export default function EmployerDashboard() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchJobs = () => {
-    axios.get('http://localhost:5000/api/jobs/employer/myjobs')
+    axios.get(`${API_URL}/api/jobs/employer/myjobs`)
       .then(({ data }) => { setJobs(data); setLoading(false); });
   };
 
@@ -20,7 +25,7 @@ export default function EmployerDashboard() {
   const deleteJob = async (id) => {
     if (!window.confirm('Delete this job?')) return;
     try {
-      await axios.delete(`http://localhost:5000/api/jobs/${id}`);
+      await axios.delete(`${API_URL}/api/jobs/${id}`);
       toast.success('Job deleted');
       fetchJobs();
     } catch {
@@ -38,7 +43,6 @@ export default function EmployerDashboard() {
           <Plus size={16} /> Post New Job
         </Link>
       </div>
-
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-white border border-gray-200 rounded-xl p-4 text-center">
           <div className="text-2xl font-bold text-gray-900">{jobs.length}</div>
@@ -53,7 +57,6 @@ export default function EmployerDashboard() {
           <div className="text-sm text-gray-500">Paused</div>
         </div>
       </div>
-
       <div className="bg-white border border-gray-200 rounded-2xl divide-y divide-gray-100">
         {jobs.length === 0 ? (
           <div className="py-16 text-center text-gray-400">No jobs posted yet</div>

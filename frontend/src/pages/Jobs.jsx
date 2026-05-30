@@ -4,6 +4,7 @@ import axios from 'axios';
 import { MapPin, Clock, IndianRupee, Search, Bookmark } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
+import API_URL from '../config';
 
 const typeColors = {
   'Full-time': 'bg-green-100 text-green-700',
@@ -27,7 +28,7 @@ export default function Jobs() {
   const fetchJobs = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get('http://localhost:5000/api/jobs', {
+      const { data } = await axios.get(`${API_URL}/api/jobs`, {
         params: { search, type, location },
       });
       let filtered = data;
@@ -43,7 +44,7 @@ export default function Jobs() {
   useEffect(() => {
     fetchJobs();
     if (user?.role === 'seeker') {
-      axios.get('http://localhost:5000/api/auth/saved-jobs')
+      axios.get(`${API_URL}/api/auth/saved-jobs`)
         .then(({ data }) => setSavedIds(data.map(j => j._id)));
     }
   }, []);
@@ -51,7 +52,7 @@ export default function Jobs() {
   const toggleSave = async (jobId) => {
     if (!user) { toast.error('Please login to save jobs'); return; }
     try {
-      const { data } = await axios.post(`http://localhost:5000/api/auth/save-job/${jobId}`);
+      const { data } = await axios.post(`${API_URL}/api/auth/save-job/${jobId}`);
       setSavedIds(prev => data.saved ? [...prev, jobId] : prev.filter(id => id !== jobId));
       toast.success(data.message);
     } catch {
@@ -66,7 +67,6 @@ export default function Jobs() {
     <div className="max-w-5xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Browse Jobs</h1>
 
-      {/* Filters */}
       <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-6">
         <div className="flex flex-wrap gap-3">
           <div className="flex items-center gap-2 border border-gray-300 rounded-lg px-3 py-2 flex-1 min-w-[180px]">
@@ -139,7 +139,6 @@ export default function Jobs() {
             ))}
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-2 mt-8">
               <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}

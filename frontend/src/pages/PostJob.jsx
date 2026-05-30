@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import API_URL from '../config';
 
 export default function PostJob() {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ export default function PostJob() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post('http://localhost:5000/api/jobs', form);
+      await axios.post(`${API_URL}/api/jobs`, form);
       toast.success('Job posted successfully!');
       navigate('/employer/dashboard');
     } catch (err) {
@@ -49,7 +50,6 @@ export default function PostJob() {
               <input name="company" value={form.company} onChange={handleChange} required className={inputClass} />
             </div>
           </div>
-
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-gray-700 block mb-1">Location *</label>
@@ -62,7 +62,6 @@ export default function PostJob() {
               </select>
             </div>
           </div>
-
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-gray-700 block mb-1">Min Salary (LPA)</label>
@@ -73,19 +72,16 @@ export default function PostJob() {
               <input name="max" type="number" value={form.salary.max} onChange={handleChange} placeholder="25" className={inputClass} />
             </div>
           </div>
-
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-1">Required Skills</label>
             <input name="skills" value={form.skills} onChange={handleChange} placeholder="React, Node.js, MongoDB (comma separated)" className={inputClass} />
           </div>
-
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-1">Job Description *</label>
             <textarea name="description" value={form.description} onChange={handleChange} required rows={5}
               placeholder="Describe the role, responsibilities, and requirements..."
               className={`${inputClass} resize-none`} />
           </div>
-
           <button type="submit" disabled={loading}
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl transition disabled:opacity-60">
             {loading ? 'Posting...' : 'Post Job'}

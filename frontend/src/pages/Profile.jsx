@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { User, Mail, Building2, Shield, Upload, FileText } from 'lucide-react';
+import API_URL from '../config';
 
 export default function Profile() {
   const { user, login } = useAuth();
@@ -25,7 +26,7 @@ export default function Profile() {
     try {
       const formData = new FormData();
       formData.append('resume', resumeFile);
-      const { data } = await axios.post('http://localhost:5000/api/auth/upload-resume', formData, {
+      const { data } = await axios.post(`${API_URL}/api/auth/upload-resume`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       login({ ...user, resume: data.resume });
@@ -47,7 +48,7 @@ export default function Profile() {
     try {
       const updateData = { name: form.name, company: form.company };
       if (form.password) updateData.password = form.password;
-      const { data } = await axios.put('http://localhost:5000/api/auth/profile', updateData);
+      const { data } = await axios.put(`${API_URL}/api/auth/profile`, updateData);
       login({ ...user, ...data });
       toast.success('Profile updated!');
     } catch (err) {
@@ -61,8 +62,6 @@ export default function Profile() {
   return (
     <div className="max-w-xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">My Profile</h1>
-
-      {/* Profile Card */}
       <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-4">
         <div className="flex items-center gap-4 mb-6">
           <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center">
@@ -78,7 +77,6 @@ export default function Profile() {
             </span>
           </div>
         </div>
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-1">
@@ -86,7 +84,6 @@ export default function Profile() {
             </label>
             <input name="name" value={form.name} onChange={handleChange} className={inputClass} />
           </div>
-
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-1">
               <Mail size={14} className="inline mr-1" />Email
@@ -95,7 +92,6 @@ export default function Profile() {
               className={`${inputClass} bg-gray-50 cursor-not-allowed`} />
             <p className="text-xs text-gray-400 mt-1">Email cannot be changed</p>
           </div>
-
           {user?.role === 'employer' && (
             <div>
               <label className="text-sm font-medium text-gray-700 block mb-1">
@@ -104,60 +100,50 @@ export default function Profile() {
               <input name="company" value={form.company} onChange={handleChange} className={inputClass} />
             </div>
           )}
-
           <hr className="border-gray-100" />
           <p className="text-sm font-medium text-gray-700">
             <Shield size={14} className="inline mr-1" />Change Password
           </p>
-
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-1">New Password</label>
             <input name="password" type="password" value={form.password}
               onChange={handleChange} placeholder="Leave blank to keep current"
               className={inputClass} />
           </div>
-
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-1">Confirm Password</label>
             <input name="confirmPassword" type="password" value={form.confirmPassword}
               onChange={handleChange} placeholder="Repeat new password"
               className={inputClass} />
           </div>
-
           <button type="submit" disabled={loading}
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl transition disabled:opacity-60">
             {loading ? 'Saving...' : 'Save Changes'}
           </button>
         </form>
       </div>
-
-      {/* Resume Upload — only for job seekers */}
       {user?.role === 'seeker' && (
         <div className="bg-white border border-gray-200 rounded-2xl p-6">
           <h2 className="font-semibold text-gray-900 mb-4">
             <FileText size={16} className="inline mr-1" />Resume
           </h2>
-
           {user?.resume && (
             <div className="flex items-center gap-2 bg-green-50 text-green-700 px-4 py-3 rounded-xl mb-4 text-sm">
               <FileText size={16} />
               <span>Resume uploaded</span>
-              <a href={`http://localhost:5000/${user.resume}`} target="_blank" rel="noreferrer"
+              <a href={`${API_URL}/${user.resume}`} target="_blank" rel="noreferrer"
                 className="ml-auto underline text-indigo-600">View</a>
             </div>
           )}
-
           <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center mb-4">
             <Upload size={24} className="mx-auto mb-2 text-gray-400" />
             <p className="text-sm text-gray-500 mb-3">Upload your resume (PDF only)</p>
             <input type="file" accept=".pdf" onChange={(e) => setResumeFile(e.target.files[0])}
               className="text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700 file:text-sm file:font-medium" />
           </div>
-
           {resumeFile && (
             <p className="text-sm text-gray-600 mb-3">Selected: {resumeFile.name}</p>
           )}
-
           <button onClick={handleResumeUpload} disabled={uploading || !resumeFile}
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl transition disabled:opacity-60">
             {uploading ? 'Uploading...' : 'Upload Resume'}

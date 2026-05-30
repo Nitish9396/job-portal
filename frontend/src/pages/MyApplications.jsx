@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { MapPin, IndianRupee } from 'lucide-react';
+import API_URL from '../config';
 
 const statusStyles = {
   pending: 'bg-yellow-100 text-yellow-700',
@@ -14,7 +15,7 @@ export default function MyApplications() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/applications/my')
+    axios.get(`${API_URL}/api/applications/my`)
       .then(({ data }) => { setApps(data); setLoading(false); });
   }, []);
 
@@ -23,16 +24,14 @@ export default function MyApplications() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">My Applications</h1>
-
       <div className="grid grid-cols-4 gap-3 mb-6">
-        {['pending','reviewing','accepted','rejected'].map((s) => (
+        {['pending', 'reviewing', 'accepted', 'rejected'].map((s) => (
           <div key={s} className="bg-white border border-gray-200 rounded-xl p-3 text-center">
             <div className="text-xl font-bold text-gray-900">{apps.filter(a => a.status === s).length}</div>
             <div className="text-xs text-gray-500 capitalize">{s}</div>
           </div>
         ))}
       </div>
-
       {apps.length === 0 ? (
         <div className="text-center py-20 text-gray-400">No applications yet</div>
       ) : (

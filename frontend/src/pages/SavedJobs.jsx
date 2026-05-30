@@ -3,19 +3,20 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { MapPin, IndianRupee, Bookmark } from 'lucide-react';
 import toast from 'react-hot-toast';
+import API_URL from '../config';
 
 export default function SavedJobs() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/auth/saved-jobs')
+    axios.get(`${API_URL}/api/auth/saved-jobs`)
       .then(({ data }) => { setJobs(data); setLoading(false); });
   }, []);
 
   const unsave = async (jobId) => {
     try {
-      await axios.post(`http://localhost:5000/api/auth/save-job/${jobId}`);
+      await axios.post(`${API_URL}/api/auth/save-job/${jobId}`);
       setJobs(jobs.filter(j => j._id !== jobId));
       toast.success('Job removed from saved');
     } catch {
@@ -28,14 +29,11 @@ export default function SavedJobs() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Saved Jobs</h1>
-
       {jobs.length === 0 ? (
         <div className="text-center py-20">
           <Bookmark size={40} className="mx-auto mb-3 text-gray-300" />
           <p className="text-gray-400">No saved jobs yet</p>
-          <Link to="/jobs" className="text-indigo-600 text-sm hover:underline mt-2 block">
-            Browse Jobs
-          </Link>
+          <Link to="/jobs" className="text-indigo-600 text-sm hover:underline mt-2 block">Browse Jobs</Link>
         </div>
       ) : (
         <div className="space-y-3">
@@ -57,8 +55,7 @@ export default function SavedJobs() {
                     ))}
                   </div>
                 </div>
-                <button onClick={() => unsave(job._id)}
-                  className="text-indigo-600 hover:text-red-500 transition">
+                <button onClick={() => unsave(job._id)} className="text-indigo-600 hover:text-red-500 transition">
                   <Bookmark size={20} fill="currentColor" />
                 </button>
               </div>
